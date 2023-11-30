@@ -7,9 +7,9 @@
   let input = null;
   let faucetInfo = {
     account: '0x0000000000000000000000000000000000000000',
-    network: 'testnet',
+    network: 'shm',
     payout: 1,
-    symbol: 'ETH',
+    symbol: 'SHM',
     hcaptcha_sitekey: '',
   };
 
@@ -26,9 +26,7 @@
     hcaptchaLoaded = true;
   };
 
-  $: document.title = `${faucetInfo.symbol} ${capitalize(
-    faucetInfo.network,
-  )} Faucet`;
+  $: document.title = `SHM Faucet`;
 
   let widgetID;
   $: if (mounted && hcaptchaLoaded) {
@@ -108,6 +106,8 @@
 </script>
 
 <svelte:head>
+    <title>SHM Faucet</title> 
+
   {#if mounted && faucetInfo.hcaptcha_sitekey}
     <script
       src="https://hcaptcha.com/1/api.js?onload=hcaptchaOnLoad&render=explicit"
@@ -127,21 +127,12 @@
               <span class="icon">
                 <i class="fa fa-bath" />
               </span>
-              <span><b>{faucetInfo.symbol} Faucet</b></span>
+              <span><b>SHM Faucet</b></span>
             </a>
           </div>
           <div id="navbarMenu" class="navbar-menu">
             <div class="navbar-end">
               <span class="navbar-item">
-                <a
-                  class="button is-white is-outlined"
-                  href="https://github.com/chainflag/eth-faucet"
-                >
-                  <span class="icon">
-                    <i class="fa fa-github" />
-                  </span>
-                  <span>View Source</span>
-                </a>
               </span>
             </div>
           </div>
@@ -153,12 +144,9 @@
       <div class="container has-text-centered">
         <div class="column is-6 is-offset-3">
           <h1 class="title">
-            Receive {faucetInfo.payout}
-            {faucetInfo.symbol} per request
+            Receive 1 SHM per request
           </h1>
-          <h2 class="subtitle">
-            Serving from {faucetInfo.account}
-          </h2>
+
           <div id="hcaptcha" data-size="invisible"></div>
           <div class="box">
             <div class="field is-grouped">
@@ -167,7 +155,7 @@
                   bind:value={input}
                   class="input is-rounded"
                   type="text"
-                  placeholder="Enter your address or ENS name"
+                  placeholder="Enter your wallet address"
                 />
               </p>
               <p class="control">
@@ -190,7 +178,7 @@
   .hero.is-info {
     background:
       linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-      url('/background.jpg') no-repeat center center fixed;
+      url('/bg.png') no-repeat center center fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
