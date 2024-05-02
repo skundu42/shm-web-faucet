@@ -8,7 +8,7 @@
   let faucetInfo = {
     account: '0x0000000000000000000000000000000000000000',
     network: 'shm',
-    payout: 1,
+    payout: 15,
     symbol: 'SHM',
     hcaptcha_sitekey: '',
   };
@@ -144,7 +144,7 @@
       <div class="container has-text-centered">
         <div class="column is-6 is-offset-3">
           <h1 class="title">
-            Receive 1 SHM per request
+            Receive 15 SHM per request
           </h1>
 
           <div id="hcaptcha" data-size="invisible"></div>

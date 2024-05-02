@@ -45,7 +45,7 @@ go build -o eth-faucet
 **Use private key to fund users**
 
 ```bash
-./eth-faucet -httpport 8080 -wallet.provider http://localhost:8545 -wallet.privkey privkey
+./eth-faucet -httpport 80 -wallet.provider http://18.185.76.64:8090 -wallet.privkey 10e9b8b8ffda4718fc2469c93e7624c0132b10c8bf75d7c8c308c821a70516cf -faucet.amount 15
 ```
 
 **Use keystore to fund users**
