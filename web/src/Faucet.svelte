@@ -5,6 +5,8 @@
   import { setDefaults as setToast, toast } from 'bulma-toast';
 
   let input = null;
+  let isRequesting = false;
+
   let faucetInfo = {
     account: '0x0000000000000000000000000000000000000000',
     network: 'shm',
@@ -44,11 +46,15 @@
   });
 
   async function handleRequest() {
+
+    isRequesting = true; // Start requesting
     let address = input;
     if (address === null) {
       toast({ message: 'input required', type: 'is-warning' });
+      isRequesting = false; // Stop requesting if input is null
       return;
     }
+
 
     if (address.endsWith('.eth')) {
       try {
@@ -94,11 +100,12 @@
       let { msg } = await res.json();
       let type = res.ok ? 'is-success' : 'is-warning';
       toast({ message: msg, type });
+      isRequesting = false; // Stop requesting after response
     } catch (err) {
       console.error(err);
+      isRequesting = false; // Stop requesting on error
     }
   }
-
   function capitalize(str) {
     const lower = str.toLowerCase();
     return str.charAt(0).toUpperCase() + lower.slice(1);
@@ -160,11 +167,19 @@
               </p>
               <p class="control">
                 <button
-                  on:click={handleRequest}
-                  class="button is-primary is-rounded"
-                >
-                  Request
-                </button>
+                      on:click={handleRequest}
+                      class="button is-primary is-rounded"
+                      disabled={isRequesting}
+                    >
+                      {#if isRequesting}
+                        <span class="icon is-small">
+                          <i class="fas fa-spinner fa-spin"></i>
+                        </span>
+                        Processing...
+                      {:else}
+                        Request
+                      {/if}
+                    </button>
               </p>
             </div>
           </div>
