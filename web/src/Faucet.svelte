@@ -3,6 +3,8 @@
   import { getAddress } from '@ethersproject/address';
   import { CloudflareProvider } from '@ethersproject/providers';
   import { setDefaults as setToast, toast } from 'bulma-toast';
+  import CircularProgress from '@smui/circular-progress';
+
 
   let input = null;
   let isRequesting = false;
@@ -166,20 +168,20 @@
                 />
               </p>
               <p class="control">
-                <button
+                  <button
                       on:click={handleRequest}
                       class="button is-primary is-rounded"
                       disabled={isRequesting}
-                    >
-                      {#if isRequesting}
-                        <span class="icon is-small">
-                          <i class="fas fa-spinner fa-spin"></i>
-                        </span>
-                        Processing...
-                      {:else}
-                        Request
+                    > Request
+                  </button>
+                        {#if isRequesting}
+                        <div class="loader-overlay">
+                          <CircularProgress indeterminate />
+                          <span class="loading-text">Processing...</span>
+                        </div>
                       {/if}
-                    </button>
+                  
+                  
               </p>
             </div>
           </div>
@@ -206,4 +208,26 @@
   .box {
     border-radius: 19px;
   }
+
+  .loader-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  z-index: 1000;
+}
+
+.loading-text {
+  margin-top: 20px;
+  font-size: 20px;
+}
+
 </style>
+
