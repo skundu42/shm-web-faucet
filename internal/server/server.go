@@ -66,7 +66,11 @@ func (s *Server) handleClaim() http.HandlerFunc {
 			"txHash":  txHash,
 			"address": address,
 		}).Info("Transaction sent successfully")
-		resp := claimResponse{Message: fmt.Sprintf("Txhash: %s", txHash)}
+		resp := claimResponse{
+			Message: fmt.Sprintf(
+				`<a href="https://explorer-sphinx.shardeum.org/transaction/%s" target="_blank">Txhash: %s</a>`,
+				txHash, txHash),
+		}
 		renderJSON(w, resp, http.StatusOK)
 	}
 }

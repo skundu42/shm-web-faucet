@@ -5,7 +5,6 @@
   import { setDefaults as setToast, toast } from 'bulma-toast';
   import CircularProgress from '@smui/circular-progress';
 
-
   let input = null;
   let isRequesting = false;
 
@@ -14,7 +13,7 @@
     network: 'shm',
     payout: 15,
     symbol: 'SHM',
-    hcaptcha_sitekey: '',
+    hcaptcha_sitekey: '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
   };
 
   let mounted = false;
@@ -24,6 +23,14 @@
     const res = await fetch('/api/info');
     faucetInfo = await res.json();
     mounted = true;
+
+    if (faucetInfo.hcaptcha_sitekey) {
+      const script = document.createElement('script');
+      script.src = "https://hcaptcha.com/1/api.js?onload=hcaptchaOnLoad&render=explicit";
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
+    }
   });
 
   window.hcaptchaOnLoad = () => {
@@ -48,7 +55,6 @@
   });
 
   async function handleRequest() {
-
     isRequesting = true; // Start requesting
     let address = input;
     if (address === null) {
@@ -57,17 +63,18 @@
       return;
     }
 
-
     if (address.endsWith('.eth')) {
       try {
         const provider = new CloudflareProvider();
         address = await provider.resolveName(address);
         if (!address) {
           toast({ message: 'invalid ENS name', type: 'is-warning' });
+          isRequesting = false; // Stop requesting on invalid ENS name
           return;
         }
       } catch (error) {
         toast({ message: error.reason, type: 'is-warning' });
+        isRequesting = false; // Stop requesting on error
         return;
       }
     }
@@ -76,6 +83,7 @@
       address = getAddress(address);
     } catch (error) {
       toast({ message: error.reason, type: 'is-warning' });
+      isRequesting = false; // Stop requesting on error
       return;
     }
 
@@ -94,20 +102,19 @@
       const res = await fetch('/api/claim', {
         method: 'POST',
         headers,
-        body: JSON.stringify({
-          address,
-        }),
+        body: JSON.stringify({ address }),
       });
 
       let { msg } = await res.json();
       let type = res.ok ? 'is-success' : 'is-warning';
       toast({ message: msg, type });
-      isRequesting = false; // Stop requesting after response
     } catch (err) {
       console.error(err);
-      isRequesting = false; // Stop requesting on error
+    } finally {
+      isRequesting = false; // Stop requesting after response or error
     }
   }
+
   function capitalize(str) {
     const lower = str.toLowerCase();
     return str.charAt(0).toUpperCase() + lower.slice(1);
@@ -115,15 +122,7 @@
 </script>
 
 <svelte:head>
-    <title>SHM Faucet</title> 
-
-  {#if mounted && faucetInfo.hcaptcha_sitekey}
-    <script
-      src="https://hcaptcha.com/1/api.js?onload=hcaptchaOnLoad&render=explicit"
-      async
-      defer
-    ></script>
-  {/if}
+  <title>SHM Faucet</title>
 </svelte:head>
 
 <main>
@@ -141,8 +140,7 @@
           </div>
           <div id="navbarMenu" class="navbar-menu">
             <div class="navbar-end">
-              <span class="navbar-item">
-              </span>
+              <span class="navbar-item"></span>
             </div>
           </div>
         </div>
@@ -152,9 +150,7 @@
     <div class="hero-body">
       <div class="container has-text-centered">
         <div class="column is-6 is-offset-3">
-          <h1 class="title">
-            Receive 15 SHM per request
-          </h1>
+          <h1 class="title">Receive 15 SHM per request</h1>
 
           <div id="hcaptcha" data-size="invisible"></div>
           <div class="box">
@@ -168,20 +164,19 @@
                 />
               </p>
               <p class="control">
-                  <button
-                      on:click={handleRequest}
-                      class="button is-primary is-rounded"
-                      disabled={isRequesting}
-                    > Request
-                  </button>
-                        {#if isRequesting}
-                        <div class="loader-overlay">
-                          <CircularProgress indeterminate />
-                          <span class="loading-text">Processing...</span>
-                        </div>
-                      {/if}
-                  
-                  
+                <button
+                  on:click={handleRequest}
+                  class="button is-primary is-rounded"
+                  disabled={isRequesting}
+                >
+                  Request
+                </button>
+                {#if isRequesting}
+                  <div class="loader-overlay">
+                    <CircularProgress indeterminate />
+                    <span class="loading-text">Processing...</span>
+                  </div>
+                {/if}
               </p>
             </div>
           </div>
@@ -193,8 +188,7 @@
 
 <style>
   .hero.is-info {
-    background:
-      linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
       url('/bg.png') no-repeat center center fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
@@ -208,26 +202,22 @@
   .box {
     border-radius: 19px;
   }
-
   .loader-overlay {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  z-index: 1000;
-}
-
-.loading-text {
-  margin-top: 20px;
-  font-size: 20px;
-}
-
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    z-index: 1000;
+  }
+  .loading-text {
+    margin-top: 20px;
+    font-size: 20px;
+  }
 </style>
-
